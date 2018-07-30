@@ -4,7 +4,7 @@ resource "aws_launch_configuration" "ecs_launch_configuration" {
   name                 = "ecs-launch-configuration"
   image_id             = "ami-aff65ad2"
   instance_type        = "t2.micro"
-  iam_instance_profile = "${aws_iam_instance_profile.ecs_instance_profile.id}"
+  iam_instance_profile = "${var.ecs_instance_profile_id}"
 
   root_block_device {
     volume_type           = "standard"
@@ -50,7 +50,7 @@ resource "aws_ecs_service" "wp_ecs_service" {
   cluster         = "${aws_ecs_cluster.ecs_cluster.id}"
   task_definition = "${aws_ecs_task_definition.wp_ecs_task_definition.family}:${max("${aws_ecs_task_definition.wp_ecs_task_definition.revision}", "${data.aws_ecs_task_definition.wp_ecs_task_definition.revision}")}"
   desired_count   = 1
-  iam_role        = "${aws_iam_role.ecs_service_role.name}"
+  iam_role        = "${var.ecs_service_role_name}"
 
   load_balancer {
     target_group_arn = "${aws_alb_target_group.alb_target_group.id}"
