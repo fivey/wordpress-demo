@@ -14,7 +14,7 @@ ifeq ($(ENV), local)
 	docker run --name $(ENV)-db -e MYSQL_ROOT_PASSWORD=password -d mysql:5.7
 	docker run --name $(ENV)-wordpress -p 8080:80 --link $(ENV)-db:mysql -d wordpress:latest
 else
-	$(MAKE) terraform_init
+	$(MAKE) terraform_apply
 endif
 
 # .PHONY: ecr-login
@@ -30,8 +30,8 @@ endif
 
 # .PHONY: docker_push
 # docker_push: check_env docker_build ecr-login
-# 	docker tag $(IMG_NAME):latest $(ACCOUNT).dkr.ecr.us-west-2.amazonaws.com/$(IMG_NAME):latest
-# 	docker push $(ACCOUNT).dkr.ecr.us-west-2.amazonaws.com/$(IMG_NAME):latest
+# 	docker tag $(IMG_NAME):latest $(ACCOUNT).dkr.ecr.us-east-1.amazonaws.com/$(IMG_NAME):latest
+# 	docker push $(ACCOUNT).dkr.ecr.us-east-1.amazonaws.com/$(IMG_NAME):latest
 
 .PHONY: terraform_init
 terraform_init: check_env
