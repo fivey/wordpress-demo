@@ -4,7 +4,7 @@ resource "aws_launch_configuration" "ecs_launch_configuration" {
   name                 = "ecs-launch-configuration"
   image_id             = "ami-aff65ad2"
   instance_type        = "t2.micro"
-  iam_instance_profile = "${var.ecs_instance_profile_id}"
+  iam_instance_profile = "${var.ecs_iam_instance_profile_id}"
 
   root_block_device {
     volume_type           = "standard"

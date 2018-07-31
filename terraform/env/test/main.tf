@@ -17,10 +17,10 @@ module "iam" {
 }
 
 module "ecs" {
-  source                  = "../../modules/ecs"
-  vpc_id                  = "${var.vpc_id}"
-  subnet_id               = "${var.subnet_id}"
-  security_group_id       = "${var.security_group_id}"
-  ecs_instance_profile_id = "${var.ecs_instance_profile_id}"
-  ecs_service_role_name   = "${var.ecs_service_role_name}"
+  source                      = "../../modules/ecs"
+  vpc_id                      = "${var.vpc_id}"
+  subnet_id                   = "${var.subnet_id}"
+  security_group_id           = "${var.security_group_id}"
+  ecs_iam_instance_profile_id = "${module.iam.ecs_iam_instance_profile_id}"
+  ecs_service_role_name       = "${module.iam.ecs_service_role_name}"
 }
