@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket  = "fivey-tfstate"
+    bucket  = "fivey-wp-demo-tfstate"
     key     = "wordpress_demo/test/terraform.tfstate"
     region  = "us-east-1"
     encrypt = 1
