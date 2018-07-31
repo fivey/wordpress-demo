@@ -38,7 +38,7 @@ resource "aws_ecs_task_definition" "wp_ecs_task_definition" {
 }
 
 data "template_file" "task_webapp" {
-  template = "${file("task-definitions/ecs_task_webapp.tpl")}"
+  template = "${file("${path.module}/task_definition.json")}"
 
   vars {
     webapp_docker_image = "${var.wp_image_name}:latest"
@@ -75,9 +75,17 @@ resource "aws_ecs_task_definition" "mysql_ecs_task_definition" {
 }
 
 data "template_file" "task_mysql" {
-  template = "${file("task-definitions/ecs_task_mysql.tpl")}"
+  template = "${file("${path.module}/task_definition.json")}"
 
   vars {
     webapp_docker_image = "${var.mysql_image_name}:5.7"
   }
+}
+
+resource "aws_ecs_service" "mysql_ecs_service" {
+  name            = "mysql-service"
+  cluster         = "${aws_ecs_cluster.ecs_cluster.id}"
+  task_definition = "${aws_ecs_task_definition.mysql_ecs_task_definition.family}:${max("${aws_ecs_task_definition.mysql_ecs_task_definition.revision}", "${data.aws_ecs_task_definition.mysql_ecs_task_definition.revision}")}"
+  desired_count   = 1
+  iam_role        = "${var.ecs_service_role_name}"
 }
