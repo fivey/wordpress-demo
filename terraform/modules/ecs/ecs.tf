@@ -27,11 +27,6 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 }
 
 # Wordpress
-data "aws_ecs_task_definition" "wp_ecs_task_definition" {
-  task_definition = "${aws_ecs_task_definition.wp_ecs_task_definition.family}"
-  depends_on      = ["aws_ecs_task_definition.wp_ecs_task_definition"]
-}
-
 resource "aws_ecs_task_definition" "wp_ecs_task_definition" {
   family                = "wp-demo-family"
   container_definitions = "${data.template_file.task_webapp.rendered}"
@@ -41,20 +36,21 @@ data "template_file" "task_webapp" {
   template = "${file("${path.module}/task_definition.json")}"
 
   vars {
-    webapp_docker_image = "${var.wp_image_name}:latest"
+    name  = "${var.wp_image_name}"
+    image = "${var.wp_image_name}:latest"
   }
 }
 
 resource "aws_ecs_service" "wp_ecs_service" {
   name            = "wp-service"
   cluster         = "${aws_ecs_cluster.ecs_cluster.id}"
-  task_definition = "${aws_ecs_task_definition.wp_ecs_task_definition.family}:${max("${aws_ecs_task_definition.wp_ecs_task_definition.revision}", "${data.aws_ecs_task_definition.wp_ecs_task_definition.revision}")}"
+  task_definition = "${aws_ecs_task_definition.wp_ecs_task_definition.arn}"
   desired_count   = 1
   iam_role        = "${var.ecs_service_role_name}"
 
   load_balancer {
     target_group_arn = "${aws_alb_target_group.alb_target_group.id}"
-    container_name   = "nginx"
+    container_name   = "wordpress"
     container_port   = "80"
   }
 
@@ -64,11 +60,6 @@ resource "aws_ecs_service" "wp_ecs_service" {
 }
 
 # MySQL
-data "aws_ecs_task_definition" "mysql_ecs_task_definition" {
-  task_definition = "${aws_ecs_task_definition.mysql_ecs_task_definition.family}"
-  depends_on      = ["aws_ecs_task_definition.mysql_ecs_task_definition"]
-}
-
 resource "aws_ecs_task_definition" "mysql_ecs_task_definition" {
   family                = "mysql-demo-family"
   container_definitions = "${data.template_file.task_mysql.rendered}"
@@ -78,14 +69,15 @@ data "template_file" "task_mysql" {
   template = "${file("${path.module}/task_definition.json")}"
 
   vars {
-    webapp_docker_image = "${var.mysql_image_name}:5.7"
+    name  = "${var.mysql_image_name}"
+    image = "${var.mysql_image_name}:5.7"
   }
 }
 
 resource "aws_ecs_service" "mysql_ecs_service" {
   name            = "mysql-service"
   cluster         = "${aws_ecs_cluster.ecs_cluster.id}"
-  task_definition = "${aws_ecs_task_definition.mysql_ecs_task_definition.family}:${max("${aws_ecs_task_definition.mysql_ecs_task_definition.revision}", "${data.aws_ecs_task_definition.mysql_ecs_task_definition.revision}")}"
+  task_definition = "${aws_ecs_task_definition.mysql_ecs_task_definition.arn}"
   desired_count   = 1
   iam_role        = "${var.ecs_service_role_name}"
 }

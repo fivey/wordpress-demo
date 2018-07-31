@@ -5,8 +5,8 @@
     "networkMode": "bridge",
     "containerDefinitions": [
         {
-            "name": "",
-            "image": "",
+            "name": "${name}",
+            "image": "${image}",
             "cpu": 0,
             "memory": 0,
             "memoryReservation": 0,
